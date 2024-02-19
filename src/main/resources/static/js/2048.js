@@ -1,32 +1,44 @@
 // below are global CONST.
 // game related
 // let board = [
-//     [0, 0, 2, 2],
-//     [0, 32, 8, 4],
-//     [128, 256, 16, 8],
-//     [0, 16, 32, 2]
+//     [2, 8, 4, 4],
+//     [16, 4, 128, 8],
+//     [32, 2, 4, 4],
+//     [4, 32, 2, 2]
+// ];
+// let board = [
+//     [2, 2, 2, 2],
+//     [4, 512, 64, 8],
+//     [2, 2, 16, 2],
+//     [64, 32, 2, 256]
 // ];
 let board = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
+    [2,1024, 4, 4],
+    [256, 2, 32, 32],
+    [4, 4, 128, 4],
+    [2, 2, 2, 2]
 ];
+// let board = [
+//     [0, 0, 0, 0],
+//     [0, 0, 0, 0],
+//     [0, 0, 0, 0],
+//     [0, 0, 0, 0]
+// ];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 2048; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
 const MINSearchTime = 70;
-const DELAYTIME = 30;
-const MAX_DEPTH = 8;
+const DELAYTIME = 0;
+const MAX_DEPTH = 6;
 
 // algorithm related
-let smoothWeight = 0.1;
-let mono2Weight = 1.0;
+let smoothWeight = 0.5;
+let mono2Weight = 0.5;
 let emptyWeight = 2.7;
-let maxWeight = 1.0;
+let maxWeight = 2.0;
 //
 let max_element = 0;
 const rows = 4;
@@ -67,11 +79,12 @@ function eval(board_){
     // let smoothWeight = 0.1;
     // let mono2Weight = 1.0;
     // let emptyWeight = 2.7;
-    // let maxWeight = 1.0;
-    return smoothness(board_) * smoothWeight
-            + monotonicity2(board_) * mono2Weight
-            + Math.log(emptyCells_len) * emptyWeight 
-            + findMaxElement(board_) * maxWeight  
+    let s = smoothness2(board_) * smoothWeight;
+    let m = monotonicity2(board_) * mono2Weight;
+    let e = emptyCells_len !== 0 ? Math.log(emptyCells_len) * emptyWeight: 0;
+    let l = findMaxElement(board_) * maxWeight;
+    return s + m + e + l;
+   
 
 }
 
@@ -90,7 +103,7 @@ async function run_AI(){
             let moveDir = getBestMove(board, playerTurn);
             if (moveDir === -1){
                 console.log("best move is found as -1. Inside run_AI. ");
-                break;
+                moveDir = DIRECTIONS[Math.floor(Math.random()*4)];
             }
             // single time or always.
 
@@ -120,13 +133,16 @@ function getBestMove(board_, playerTurn_){
     let start = (new Date()).getTime();
     let depth = 0;
     let best = -1;
+    // let actionSet = [];
 
     do{
+        let actionSet = [];
         let newBest = searchBestMove(board_, playerTurn_, depth, -10000, 10000, 0, 0);
+        actionSet.push(newBest);
         if (newBest.move == -1){
             console.log("search failed for this. inside getBestMove.");
             console.log(board_);
-            break;
+            // break;
         }else{
             best = newBest.move;
         }
@@ -530,6 +546,33 @@ function findMaxElement(array) {
   }
 
 
+function smoothness2(board_){
+    let smoothness = 0;
+    for (let x = 0; x < 4; x++){
+        for(let y = 0; y < 4; y++){
+            let temp = [];
+            if (withinBounds(x-1, y)&&board_[x][y]!==0&&board_[x-1][y]!==0){
+                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x-1][y])/Math.log(2)));
+            }
+            if (withinBounds(x+1, y)&&board_[x][y]!==0&&board_[x+1][y]!==0){
+                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x+1][y])/Math.log(2)));
+            }
+            if (withinBounds(x, y-1)&&board_[x][y]!==0&&board_[x][y-1]!==0){
+                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x][y-1])/Math.log(2)));
+            }
+            if (withinBounds(x, y+1)&&board_[x][y]!==0&&board_[x][y+1]!==0){
+                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x][y+1])/Math.log(2)));
+            }
+            if (temp.length!==0){
+                smoothness += Math.max(...temp);
+            }
+        }
+    }
+
+    return smoothness/16;
+}
+
+
 //algorithm related
 function smoothness(board_) {
     let smoothness = 0;
@@ -678,9 +721,9 @@ function monotonicity2(board_){
             let nextValue = cellOccupied(board_, r, next) ? Math.log(cellContent(board_, r, next)) / Math.log(2) : 0;
             
             if (currentValue > nextValue){
-                totals[0] += nextValue - currentValue;
+                totals[0] += currentValue - nextValue;
             } else if (nextValue > currentValue){
-                totals[1] += currentValue - nextValue
+                totals[1] += nextValue - currentValue;
             }
             current = next;
             next++;
@@ -701,15 +744,15 @@ function monotonicity2(board_){
             let nextValue = cellOccupied(board_, next, c) ? Math.log(cellContent(board_, next, c)) / Math.log(2) : 0;
             
             if (currentValue > nextValue){
-                totals[0] += nextValue - currentValue;
+                totals[2] += currentValue - nextValue;
             } else if (nextValue > currentValue){
-                totals[1] += currentValue - nextValue
+                totals[3] += nextValue - currentValue;
             }
             current = next;
             next++;
         }
     }
-    return Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3]);
+    return (Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3])) / 4;
 
 }
 
