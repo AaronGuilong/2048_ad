@@ -12,21 +12,21 @@
 //     [2, 2, 16, 2],
 //     [64, 32, 2, 256]
 // ];
-let board = [
-    [2,1024, 4, 4],
-    [256, 2, 32, 32],
-    [4, 4, 128, 4],
-    [2, 2, 2, 2]
-];
 // let board = [
-//     [0, 0, 0, 0],
-//     [0, 0, 0, 0],
-//     [0, 0, 0, 0],
-//     [0, 0, 0, 0]
+//     [2,1024, 4, 4],
+//     [256, 2, 32, 32],
+//     [4, 4, 128, 4],
+//     [2, 2, 2, 2]
 // ];
+let board = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
+];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 2048; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
@@ -569,7 +569,7 @@ function smoothness2(board_){
         }
     }
 
-    return smoothness/16;
+    return -smoothness;
 }
 
 
