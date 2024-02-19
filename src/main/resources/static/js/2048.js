@@ -26,17 +26,17 @@ let board = [
 ];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 1024; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
 const MINSearchTime = 170;
 const DELAYTIME = 0;
-const MAX_DEPTH = 6;
+const MAX_DEPTH = 7;
 
 // algorithm related
 let smoothWeight = 0.5;
-let mono2Weight = 0.5;
+let mono2Weight = 1.0;
 let emptyWeight = 2.7;
 let maxWeight = 2.0;
 //
