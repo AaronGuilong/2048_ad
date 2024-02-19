@@ -26,11 +26,11 @@ let board = [
 ];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 1024; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
-const MINSearchTime = 70;
+const MINSearchTime = 170;
 const DELAYTIME = 0;
 const MAX_DEPTH = 6;
 
@@ -83,8 +83,7 @@ function eval(board_){
     let m = monotonicity2(board_) * mono2Weight;
     let e = emptyCells_len !== 0 ? Math.log(emptyCells_len) * emptyWeight: 0;
     let l = findMaxElement(board_) * maxWeight;
-    return s + m + e + l;
-   
+    return s + m + e + l;  
 
 }
 
@@ -96,6 +95,7 @@ async function run_AI(){
     while(true){
         if (max_element >= VICTORY_SCORE) {
             displayVictory();
+            acceptKeyboardInput = false;
             break;
         }else if (is_gameOver(board)){
             break;
@@ -115,10 +115,8 @@ async function run_AI(){
             updateVisualBoard();
             document.getElementById("score").innerText = score_global;
             max_element = findMaxElement(board);
-            if (max_element >= VICTORY_SCORE) {
-                displayVictory();
-                acceptKeyboardInput = false;
-            }
+
+            
         }
     }
 }
