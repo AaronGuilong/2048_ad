@@ -26,19 +26,19 @@ let board = [
 ];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 2048; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
-const MINSearchTime = 170;
+const MINSearchTime = 500;
 const DELAYTIME = 0;
-const MAX_DEPTH = 7;
+const MAX_DEPTH = 10;
 
 // algorithm related
-let smoothWeight = 0.5;
+let smoothWeight = 0.1;
 let mono2Weight = 1.0;
 let emptyWeight = 2.7;
-let maxWeight = 2.0;
+let maxWeight = 1.0;
 //
 let max_element = 0;
 const rows = 4;
@@ -79,7 +79,7 @@ function eval(board_){
     // let smoothWeight = 0.1;
     // let mono2Weight = 1.0;
     // let emptyWeight = 2.7;
-    let s = smoothness2(board_) * smoothWeight;
+    let s = smoothness(board_) * smoothWeight;
     let m = monotonicity2(board_) * mono2Weight;
     let e = emptyCells_len !== 0 ? Math.log(emptyCells_len) * emptyWeight: 0;
     let l = findMaxElement(board_) * maxWeight;
@@ -719,9 +719,9 @@ function monotonicity2(board_){
             let nextValue = cellOccupied(board_, r, next) ? Math.log(cellContent(board_, r, next)) / Math.log(2) : 0;
             
             if (currentValue > nextValue){
-                totals[0] += currentValue - nextValue;
+                totals[0] += nextValue - currentValue;
             } else if (nextValue > currentValue){
-                totals[1] += nextValue - currentValue;
+                totals[1] += currentValue - nextValue;
             }
             current = next;
             next++;
@@ -742,15 +742,15 @@ function monotonicity2(board_){
             let nextValue = cellOccupied(board_, next, c) ? Math.log(cellContent(board_, next, c)) / Math.log(2) : 0;
             
             if (currentValue > nextValue){
-                totals[2] += currentValue - nextValue;
+                totals[2] += nextValue - currentValue;
             } else if (nextValue > currentValue){
-                totals[3] += nextValue - currentValue;
+                totals[3] += currentValue - nextValue;
             }
             current = next;
             next++;
         }
     }
-    return (Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3])) / 4;
+    return (Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3]));
 
 }
 
