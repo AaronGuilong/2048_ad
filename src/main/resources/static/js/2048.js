@@ -30,15 +30,15 @@ const VICTORY_SCORE = 512; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
-const MINSearchTime = 170;
+const MINSearchTime = 250;
 const DELAYTIME = 0;
 const MAX_DEPTH = 7;
 
 // algorithm related
-let smoothWeight = 0.5;
+let smoothWeight = 0.1;
 let mono2Weight = 1.0;
 let emptyWeight = 2.7;
-let maxWeight = 2.0;
+let maxWeight = 1.0;
 //
 let max_element = 0;
 const rows = 4;
@@ -567,7 +567,7 @@ function smoothness2(board_){
         }
     }
 
-    return -smoothness;
+    return smoothness;
 }
 
 
