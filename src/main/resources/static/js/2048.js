@@ -30,9 +30,9 @@ const VICTORY_SCORE = 2048; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
-const MINSearchTime = 250;
+const MINSearchTime = 400;
 const DELAYTIME = 0;
-const MAX_DEPTH = 10;
+const MAX_DEPTH = [1, 2, 4, 5, 5, 6, 6, 6, 6, 6, 5, 4, 3, 2, 1, 1, 1];
 
 // algorithm related
 let smoothWeight = 0.1;
@@ -40,6 +40,8 @@ let mono2Weight = 1.0;
 let emptyWeight = 2.7;
 let maxWeight = 1.0;
 //
+NORM1 = true; // default is NORM-INFINITE.
+
 let max_element = 0;
 const rows = 4;
 const columns = 4;
@@ -79,7 +81,7 @@ function eval(board_){
     // let smoothWeight = 0.1;
     // let mono2Weight = 1.0;
     // let emptyWeight = 2.7;
-    let s = smoothness(board_) * smoothWeight;
+    let s = smoothness2(board_) * smoothWeight;
     let m = monotonicity2(board_) * mono2Weight;
     let e = emptyCells_len !== 0 ? Math.log(emptyCells_len) * emptyWeight: 0;
     let l = findMaxElement(board_) * maxWeight;
@@ -131,9 +133,11 @@ function getBestMove(board_, playerTurn_){
     let start = (new Date()).getTime();
     let depth = 0;
     let best = -1;
+    let i = availableCells(board_).length;;
     // let actionSet = [];
 
-    do{
+    // while((new Date()).getTime() - start < MINSearchTime && depth <= MAX_DEPTH[i]){
+    while(depth < MAX_DEPTH[i]){
         let actionSet = [];
         let newBest = searchBestMove(board_, playerTurn_, depth, -10000, 10000, 0, 0);
         actionSet.push(newBest);
@@ -145,7 +149,7 @@ function getBestMove(board_, playerTurn_){
             best = newBest.move;
         }
         depth++;
-    }while((new Date()).getTime() - start < MINSearchTime && depth < MAX_DEPTH);
+    };
     
     return best;
 }
@@ -165,7 +169,6 @@ function searchBestMove(board_, playerTurn_, depth, alpha, beta, positions, cuto
             let new_playTurn = true;
             //
             slideWithMove(new_board, direction);
-            setTwo(new_board);
             // 
             positions++;
             //
@@ -177,6 +180,7 @@ function searchBestMove(board_, playerTurn_, depth, alpha, beta, positions, cuto
                 result = { move: direction, score: eval(new_board) };
             } else {
                 //else go into DFS search.
+                setTwo(new_board);
                 result = searchBestMove(new_board, new_playTurn, depth-1, bestScore, beta, positions, cutoffs);
                 if (result.score > 9900){
                     result.score--;
@@ -562,7 +566,15 @@ function smoothness2(board_){
                 temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x][y+1])/Math.log(2)));
             }
             if (temp.length!==0){
-                smoothness += Math.max(...temp);
+                if (NORM1){
+                    let sum = 0;
+                    for (let i = 0; i < temp.length; i++) {
+                      sum += Math.abs(temp[i]);
+                    }
+                    smoothness += sum;
+                }else{
+                    smoothness += Math.max(...temp);
+                }
             }
         }
     }
