@@ -23,8 +23,14 @@
 			<tr>
 				<th>性別：</th>
 				<td>
-				<input type="radio" th:field="*{gender}" th:value="1">男性
-				<input type="radio" th:field="*{gender}" th:value="0">女性
+					<label>
+
+						<input type="radio" th:field="*{gender}" th:value="1">男性
+					</label>
+					<label>
+
+						<input type="radio" th:field="*{gender}" th:value="0">女性
+					</label>
 				<span th:errors="*{gender}" class="error"></span><br>
 			</td>
 		</tr>
@@ -32,12 +38,20 @@
 			<tr>
 			<th>好きな広告：</th> 
 				<td>
-				<input type="radio" th:field="*{ad_Id}" th:value="1">
-			 	<img th:src="@{/images/image1.jpg}"  width="200" height="200" alt="This is an IT ad.">
-			 	<input type="radio" th:field="*{ad_Id}" th:value="2">
-			    <img th:src="@{/images/image2.jpg}"  width="200" height="200" alt="This is an car ad.">
-			    <input type="radio" th:field="*{ad_Id}" th:value="3">
-			    <img th:src="@{/images/image3.jpg}"  width="200" height="200" alt="This is an mobile ad.">
+				<label >
+					<input type="radio" th:field="*{ad_Id}" th:value="1">
+					 <img th:src="@{/images/image1.jpg}"  width="200" height="200" alt="This is an IT ad.">
+				</label>
+				<label>
+					
+					<input type="radio" th:field="*{ad_Id}" th:value="2">
+					<img th:src="@{/images/image2.jpg}"  width="200" height="200" alt="This is an car ad.">
+				</label>
+				
+				<label>
+					<input type="radio" th:field="*{ad_Id}" th:value="3">
+					<img th:src="@{/images/image3.jpg}"  width="200" height="200" alt="This is an mobile ad.">
+				</label>
 				</td>
 		</tr>		
 		</table>

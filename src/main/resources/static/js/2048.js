@@ -13,10 +13,10 @@
 //     [64, 32, 2, 256]
 // ];
 // let board = [
-//     [2,1024, 4, 4],
-//     [256, 2, 32, 32],
-//     [4, 4, 128, 4],
-//     [2, 2, 2, 2]
+//     [1024, 512, 8, 4],
+//     [32, 2, 0, 8],
+//     [32, 64, 0, 0],
+//     [16, 0, 0, 0]
 // ];
 let board = [
     [0, 0, 0, 0],
@@ -26,19 +26,21 @@ let board = [
 ];
 let playerTurn = true;  // f
 let score_global = 0;
-const VICTORY_SCORE = 2048; // it should be set as 2048 for testing, 4
+const VICTORY_SCORE = 1024; // it should be set as 2048 for testing, 4
 
 // ai run
 let runAI = true;
 const MINSearchTime = 400;
-const DELAYTIME = 0;
-const MAX_DEPTH = [1, 2, 4, 5, 5, 6, 6, 6, 6, 6, 5, 4, 3, 2, 1, 1, 1];
+const DELAYTIME = 200;
+const MAX_DEPTH = [1, 3, 6, 7, 7, 7, 7, 7, 6, 6, 5, 4, 3, 2, 1, 1, 1];
 
 // algorithm related
-let smoothWeight = 0.1;
+let smoothWeight = 0.0;  //0.01
+let smooth1Weight = 0.01;  //0.1
 let mono2Weight = 1.0;
-let emptyWeight = 2.7;
+let emptyWeight = 3.8;  //2.7
 let maxWeight = 1.0;
+let scoreWeight = 0.0;
 //
 NORM1 = true; // default is NORM-INFINITE.
 
@@ -82,10 +84,12 @@ function eval(board_){
     // let mono2Weight = 1.0;
     // let emptyWeight = 2.7;
     let s = smoothness2(board_) * smoothWeight;
+    let s1 = smoothness(board_) * smooth1Weight;
     let m = monotonicity2(board_) * mono2Weight;
-    let e = emptyCells_len !== 0 ? Math.log(emptyCells_len) * emptyWeight: 0;
+    let e = emptyCells_len !== 0 ? Math.log(emptyCells_len + 1) * emptyWeight: 0;
     let l = findMaxElement(board_) * maxWeight;
-    return s + m + e + l;  
+    let score_ = Math.log(score_global + 1)/Math.log(2) * scoreWeight;
+    return s + s1 + m + e + l + score_; 
 
 }
 
@@ -554,16 +558,16 @@ function smoothness2(board_){
         for(let y = 0; y < 4; y++){
             let temp = [];
             if (withinBounds(x-1, y)&&board_[x][y]!==0&&board_[x-1][y]!==0){
-                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x-1][y])/Math.log(2)));
+                temp.push(Math.abs((board_[x][y]) - (board_[x-1][y])));
             }
             if (withinBounds(x+1, y)&&board_[x][y]!==0&&board_[x+1][y]!==0){
-                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x+1][y])/Math.log(2)));
+                temp.push(Math.abs((board_[x][y]) - (board_[x+1][y])));
             }
             if (withinBounds(x, y-1)&&board_[x][y]!==0&&board_[x][y-1]!==0){
-                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x][y-1])/Math.log(2)));
+                temp.push(Math.abs((board_[x][y]) - (board_[x][y-1])));
             }
             if (withinBounds(x, y+1)&&board_[x][y]!==0&&board_[x][y+1]!==0){
-                temp.push(Math.abs(Math.log(board_[x][y])/Math.log(2) - Math.log(board_[x][y+1])/Math.log(2)));
+                temp.push(Math.abs((board_[x][y]) - (board_[x][y+1])));
             }
             if (temp.length!==0){
                 if (NORM1){
@@ -579,7 +583,7 @@ function smoothness2(board_){
         }
     }
 
-    return smoothness;
+    return -smoothness;
 }
 
 
