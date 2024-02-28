@@ -29,7 +29,7 @@ let score_global = 0;
 const VICTORY_SCORE = 1024; // it should be set as 2048 for testing, 4
 
 // ai run
-let runAI = true;
+let runAI = false;
 const MINSearchTime = 400;
 const DELAYTIME = 200;
 const MAX_DEPTH = [1, 3, 6, 7, 7, 7, 7, 7, 6, 6, 5, 4, 3, 2, 1, 1, 1];
